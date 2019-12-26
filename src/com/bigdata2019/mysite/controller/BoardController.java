@@ -30,12 +30,15 @@ public class BoardController extends HttpServlet {
 		else if("write".equals(action)){
 			HttpSession session = request.getSession();						
 			if(session == null) {
-				WebUtil.redirect(request, response, request.getContextPath() + "/board?a=noUser");
+				request.setAttribute("result", "noUser");
+				WebUtil.redirect(request, response, request.getContextPath() + "/board");
 				return;
 			} 
 			UserVo userVo = (UserVo)session.getAttribute("authUser");
-			if(userVo == null) {				
-				WebUtil.redirect(request, response, request.getContextPath() + "/board?a=noUser");
+			if(userVo == null) {
+				request.setAttribute("result", "noUser");
+				
+				WebUtil.redirect(request, response, request.getContextPath() + "/board");
 				return;
 			}	
 			Long userNo = userVo.getNo();
@@ -54,13 +57,10 @@ public class BoardController extends HttpServlet {
 			} else {
 				a = "fail";
 			}
-			WebUtil.redirect(request, response, request.getContextPath() + "/board?a="+a);
+			request.setAttribute("result", a);
+			WebUtil.redirect(request, response, request.getContextPath() + "/board");
 		
-		} else if("joinsuccess".equals(action)){
-			WebUtil.forward(request, response, "/WEB-INF/views/user/joinsuccess.jsp");
-		} else if("loginform".equals(action)){
-			WebUtil.forward(request, response, "/WEB-INF/views/user/loginform.jsp");
-		} else if("updateform".equals(action)){
+		}  else if("updateform".equals(action)){
 			/* 접근 제어(ACL) */
 			HttpSession session = request.getSession();
 			if(session == null) {
@@ -80,46 +80,43 @@ public class BoardController extends HttpServlet {
 			request.setAttribute("userVo", userVo);
 			WebUtil.forward(request, response, "/WEB-INF/views/user/updateform.jsp");
 			
-		} else if("login".equals(action)){
-			String email = request.getParameter("email");
-			String password = request.getParameter("password");
-		
-			UserVo vo = new UserDao().find(email, password);
-			if(vo == null) {
-				WebUtil.redirect(request, response, request.getContextPath() + "/user?a=loginform&result=fail");
-				return;
-			}
-			
-			// 로그인 처리
-			HttpSession session = request.getSession(true);
-			session.setAttribute("authUser", vo);
-			
-			// main으로 리다이렉트
-			WebUtil.redirect(request, response, request.getContextPath());
-			
-		} else if("logout".equals(action)){
-			HttpSession session = request.getSession();
-			if(session == null) {
-				WebUtil.redirect(request, response, request.getContextPath());
-				return;
-			}
-			
-			UserVo authUser = (UserVo)session.getAttribute("authUser");
-			if(authUser == null) {
-				WebUtil.redirect(request, response, request.getContextPath());
-				return;
-			}
-			
-			// logout 처리
-			session.removeAttribute("authUser");
-			session.invalidate();
-			
-			WebUtil.redirect(request, response, request.getContextPath());
-		} else {
+		}  else {
+			//getAttribute vs getParameter
 			List<BoardVo> list = new ArrayList<BoardVo>();
-			list = new BoardDao().findAll();
+			//페이징 처리 
+			String paging = "";
+			int totalPage = 19;
+			int startPage = 0;
+			int lastPage = 0;
+			String selectedPage = "1";
+			int currentPage = 1;
+			if(request.getParameter("selectedPage") == null || ("").equals(request.getParameter("selectedPage"))) {
+				paging = "LIMIT 0, 10";
+			}else {	
+				selectedPage = request.getParameter("selectedPage");
+				lastPage = Integer.parseInt(selectedPage) * 10;
+				startPage = lastPage - 10;						
+				paging = "LIMIT " + startPage + ", 10";
+				currentPage = Integer.parseInt(selectedPage) / 5 + 1;
+				
+				
+			}
+			
+			
+			
+			list = new BoardDao().findAll(paging);
+			
+			
+			
 			request.setAttribute("list", list);
-			WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
+			String result = "";
+			if(request.getAttribute("result") == null ) {
+			} else {				
+				result = request.getAttribute("result").toString();
+			}
+			request.setAttribute("result", result);
+			request.setAttribute("currentPage", currentPage);
+			WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp?selectedPage=" + selectedPage);
 		} 
 		
 		

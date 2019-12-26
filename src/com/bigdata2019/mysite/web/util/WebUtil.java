@@ -18,9 +18,13 @@ public class WebUtil {
 	
 	public static void redirect(
 			HttpServletRequest request,
-			HttpServletResponse response,
-			String url) throws ServletException, IOException {
+			HttpServletResponse response,			
+			String url) throws ServletException, IOException {		
+		request.setAttribute("result",request.getAttribute("result"));
+		//파라미터 post전달하는 방법
 		response.sendRedirect(url);
 	}
+	
+	
 	
 }

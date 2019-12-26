@@ -3,8 +3,10 @@
 <%@page import="java.util.List"%>
 <%@page import="com.bigdata2019.mysite.vo.BoardVo"%>
 <%
-	String result = request.getParameter("result");
-	String flag = request.getParameter("a");
+	//getAttribute vs getParameter
+	String flag = request.getAttribute("result").toString();
+	String selectedPage = request.getParameter("selectedPage");
+	String currentPage = request.getParameter("currentPage");
 	List<BoardVo> list = new ArrayList<BoardVo>();
 	list = (List<BoardVo>)request.getAttribute("list");
 %>
@@ -51,13 +53,17 @@
 				<!-- pager 추가 -->
 				<div class="pager">
 					<ul>
-						<li class="selected"><a href="">◀</a></li>
-						<li><a href="">1</a></li>
-						<li>2</li>
-						<li><a href="">3</a></li>
-						<li>4</li>
-						<li>5</li>
-						<li><a href="javascript:paging()">▶</a></li>
+						<li><a href="javascript:fn_prev()">◀</a></li>
+						<%	
+						
+						for( int b = 1; b < 6; b++ ){
+						%>
+							<li id="<%=b %>"><a href="javascript:fn_paging(<%=b %>)"><%=b %></a></li>
+							<%-- <li id="<%=b %>"><a href="javascript:fn_paging(this)"><%=b %></a></li> --%>
+						<%
+						}
+						%>
+						<li><a href="javascript:fn_next()">▶</a></li>
 					</ul>
 				</div>					
 				<!-- pager 추가 -->
@@ -68,7 +74,13 @@
 			</div>
 		</div>
 		<script type="text/javascript">
+		var selectedPage = 0;
 		window.onload = function () {		
+			
+			selectedPage = '<%=selectedPage%>';							
+			document.getElementById(selectedPage).classList.add('selected');
+			
+			
 			var flag = '<%=flag%>';
 			if(flag == 'suc'){
 				alert('게시글 등록에 성공했습니다.');	
@@ -84,9 +96,22 @@
 			//window.location.href = '<%=request.getContextPath() %>/board?no=' + no;
 			//submit
 		}
-		function paging(){
+		function fn_paging(selectedPage){
+			//console.log(this);
+			//console.log(selectedPage);					
+			window.location.href = '<%=request.getContextPath() %>/board?selectedPage=' + selectedPage;
+		}
+		
+		function fn_prev(){
+			
 			
 		}
+		
+		function fn_next(){
+			
+			
+		}
+		
 		</script>
 		<jsp:include page="/WEB-INF/views/includes/navigation.jsp"/>
 		<jsp:include page="/WEB-INF/views/includes/footer.jsp"/>

@@ -11,6 +11,9 @@ public class PagingUtil {
 	private int nextPage = 0;
 	private int totalpage = 0;
 	private int pageCount = 0;
+	private int clickPage = 0;
+	private int currentPage = 0;
+	private int selectedPage = 0;
 	
 	/*
 	 * 
@@ -23,7 +26,7 @@ public class PagingUtil {
 		pageCount = totalpage / 10 ; 
 		
 		
-		
+	    //LIMIT 0 , 2;
 	}
 	
 	

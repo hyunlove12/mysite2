@@ -17,7 +17,7 @@ public class BoardDao {
 	 * 게시판 리스트 출력
 	 * 
 	 * */	
-	public List<BoardVo> findAll(){
+	public List<BoardVo> findAll(String paging){
 		List<BoardVo> result = new ArrayList<BoardVo>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -42,12 +42,16 @@ public class BoardDao {
 				    " FROM BOARD B" +
 				    " LEFT OUTER JOIN USER U " +
 				    " ON B.NO2 = U.NO " +
-				    " ORDER BY B.G_NO, B.DEPTH, B.O_NO " +
-				    " LIMIT ? , ? ";
+				    " ORDER BY B.G_NO, B.DEPTH, B.O_NO ";
+			
+			if(("").equals(paging) || paging != null) {
+				sql += paging; 
+			}
 			
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setInt(1, 0);
-			pstmt.setInt(2, 2);
+			//이상 미만
+			//pstmt.setInt(1, 0);
+			//pstmt.setInt(2, 2);
 			rs = pstmt.executeQuery();
 			while(rs.next()) {
 				BoardVo vo = new BoardVo();
