@@ -9,6 +9,9 @@
 	String currentPage = request.getParameter("currentPage");
 	List<BoardVo> list = new ArrayList<BoardVo>();
 	list = (List<BoardVo>)request.getAttribute("list");
+	int prevPage = Integer.parseInt(request.getAttribute("prevPage").toString());
+	int nextPage = Integer.parseInt(request.getAttribute("nextPage").toString());
+	int lastPage = Integer.parseInt(request.getAttribute("lastPage").toString());
 %>
 <!DOCTYPE html>
 <html>
@@ -53,17 +56,44 @@
 				<!-- pager 추가 -->
 				<div class="pager">
 					<ul>
-						<li><a href="javascript:fn_prev()">◀</a></li>
-						<%	
-						
-						for( int b = 1; b < 6; b++ ){
+						<% 
+							if(prevPage == 0){
+						%>
+							<li>◀</li>
+						<%
+							}else{
+						%>
+							<li><a href="javascript:fn_prev(<%=prevPage %>)">◀</a></li>
+						<%
+							}
+						%>
+						<%						
+							int start = prevPage;
+							int stop = nextPage;
+							for( int b = 1 + prevPage; b < nextPage; b++ ){
+								if(b <= lastPage){
 						%>
 							<li id="<%=b %>"><a href="javascript:fn_paging(<%=b %>)"><%=b %></a></li>
 							<%-- <li id="<%=b %>"><a href="javascript:fn_paging(this)"><%=b %></a></li> --%>
 						<%
-						}
+							} else {
+						%>	
+							<li id="<%=b %>"><%=b %></li>
+						<%	
+								}
+							}
 						%>
-						<li><a href="javascript:fn_next()">▶</a></li>
+						<% 
+							if(nextPage > lastPage){
+						%>
+							<li>▶</li>
+						<%
+							}else{
+						%>
+							<li><a href="javascript:fn_next(<%=nextPage %>)">▶</a></li>
+						<%
+							}
+						%>						
 					</ul>
 				</div>					
 				<!-- pager 추가 -->
@@ -102,14 +132,12 @@
 			window.location.href = '<%=request.getContextPath() %>/board?selectedPage=' + selectedPage;
 		}
 		
-		function fn_prev(){
-			
-			
+		function fn_prev(prevPage){			
+			window.location.href = '<%=request.getContextPath() %>/board?selectedPage=' + prevPage;
 		}
 		
-		function fn_next(){
-			
-			
+		function fn_next(nextPage){			
+			window.location.href = '<%=request.getContextPath() %>/board?selectedPage=' + nextPage;
 		}
 		
 		</script>

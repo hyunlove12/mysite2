@@ -21,7 +21,7 @@ public class PagingUtil {
 	 * */	
 	public void paging() {
 		//총 카운트 개수
-		totalpage = this.find();
+		//totalpage = this.find();
 		//총 페이징 개수
 		pageCount = totalpage / 10 ; 
 		
@@ -32,7 +32,7 @@ public class PagingUtil {
 	
 	
 	
-	public int find(){		
+	public int totalCount(String tableName){		
 		int result = 0;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -40,7 +40,7 @@ public class PagingUtil {
 		
 		try {
 			conn = getConnection();			
-			String sql = "SELECT COUNT(*) AS TOTAL_COUNT FROM BOARD";
+			String sql = "SELECT COUNT(*) AS TOTAL_COUNT FROM " + tableName;
 			pstmt = conn.prepareStatement(sql);
 			rs = pstmt.executeQuery();			
 			if(rs.next()) {

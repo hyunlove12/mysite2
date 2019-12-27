@@ -14,6 +14,7 @@ import com.bigdata2019.mysite.repository.BoardDao;
 import com.bigdata2019.mysite.repository.UserDao;
 import com.bigdata2019.mysite.vo.BoardVo;
 import com.bigdata2019.mysite.vo.UserVo;
+import com.bigdata2019.mysite.web.util.PagingUtil;
 import com.bigdata2019.mysite.web.util.WebUtil;
 
 public class BoardController extends HttpServlet {
@@ -84,31 +85,39 @@ public class BoardController extends HttpServlet {
 			//getAttribute vs getParameter
 			List<BoardVo> list = new ArrayList<BoardVo>();
 			//페이징 처리 
-			String paging = "";
-			int totalPage = 19;
-			int startPage = 0;
-			int lastPage = 0;
-			String selectedPage = "1";
-			int currentPage = 1;
+			String paging = "";	//slq의 LIMIT옵션
+			String tableName = "BOARD";	//테이블 명
+			PagingUtil pg = new PagingUtil();
+			int totalPage = pg.totalCount(tableName);	//토탈 페이지
+			int startPage = 0;	//쿼리가 시작되는 row 번호
+			int lastPage = 0;	//10개 단위의 페이징 그룹 개수
+			int selectedPage = 1;	//선택된 페이지
+			int currentPage = 1;	//현재 페이지 그룹(5개 기준으로 나눔)
+			int prevPage = 0;	//전 페이지(5, 10, 15, .... )
+			int nextPage = 6;	//넥스트 페이지(6, 11, 16, 21, ...)
 			if(request.getParameter("selectedPage") == null || ("").equals(request.getParameter("selectedPage"))) {
 				paging = "LIMIT 0, 10";
 			}else {	
-				selectedPage = request.getParameter("selectedPage");
-				lastPage = Integer.parseInt(selectedPage) * 10;
-				startPage = lastPage - 10;						
+				selectedPage = Integer.parseInt(request.getParameter("selectedPage"));
+				startPage = selectedPage * 10 - 10;						
 				paging = "LIMIT " + startPage + ", 10";
-				currentPage = Integer.parseInt(selectedPage) / 5 + 1;
-				
-				
+				currentPage = selectedPage / 5 + 1; //선택된 페이지 그룹
+				if(selectedPage % 5 == 0) {
+					currentPage--; 
+				}
+				prevPage = (currentPage - 1) * 5;				
 			}
-			
-			
+			lastPage = totalPage / 10 + 1;
+			if(lastPage % 10 == 0) {
+				lastPage--; 
+			}
 			
 			list = new BoardDao().findAll(paging);
 			
-			
-			
+			request.setAttribute("prevPage", prevPage);
+			request.setAttribute("nextPage", nextPage);			
 			request.setAttribute("list", list);
+			request.setAttribute("lastPage", lastPage);
 			String result = "";
 			if(request.getAttribute("result") == null ) {
 			} else {				
